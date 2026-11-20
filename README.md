@@ -11,6 +11,9 @@ Unity 菜单 **QF → Build Windows**，产出 `Builds/Windows/QianFoShan.exe`�
 加 `-qftest` 参数启动会自动走一遍并截图到 `Shots/`。
 
 ## 在 GitHub 上编译 iPad 版
-Actions → **Build iPad** → Run workflow。需要先在 Settings → Secrets and variables → Actions 设定：
-`UNITY_LICENSE`（Unity_lic.ulf 的内容）、`UNITY_EMAIL`、`UNITY_PASSWORD`。
-完成后下载 `QianFoShan-iPad`（未签名 .ipa），用 Sideloadly 以自己的 Apple ID 安装到 iPad。
+1. 在 Windows 上用 Unity 菜单 **QF → Build iOS (Xcode project)** 导出 `Builds/iOS`（需要 iOS Build Support 模块）。
+2. 把 `Builds/iOS` 压成 `xcode-project.zip`，上传到 release `ios-latest`。
+3. Actions → **Build iPad** → Run workflow。GitHub 的 Mac 会编出未签名的 `QianFoShan-iPad.ipa`，附在同一个 release 上。
+4. 用 Sideloadly 以自己的 Apple ID 签名并安装到 iPad。
+
+这个流程不需要在 GitHub 上放 Unity 帐号或授权。

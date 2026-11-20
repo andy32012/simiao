@@ -74,7 +74,14 @@ public static class QFSetup
 
         // ---- player ----
         PlayerSettings.colorSpace = ColorSpace.Linear;
-        PlayerSettings.defaultInterfaceOrientation = UIOrientation.LandscapeLeft;
+        PlayerSettings.defaultInterfaceOrientation = UIOrientation.AutoRotation;
+        PlayerSettings.allowedAutorotateToLandscapeLeft = true; PlayerSettings.allowedAutorotateToLandscapeRight = true;
+        PlayerSettings.allowedAutorotateToPortrait = false; PlayerSettings.allowedAutorotateToPortraitUpsideDown = false;
+        PlayerSettings.iOS.targetOSVersionString = "15.0";
+        PlayerSettings.SetScriptingBackend(UnityEditor.Build.NamedBuildTarget.iOS, ScriptingImplementation.IL2CPP);
+        PlayerSettings.SetArchitecture(UnityEditor.Build.NamedBuildTarget.iOS, 1);   // ARM64
+        PlayerSettings.iOS.appleEnableAutomaticSigning = false;
+        PlayerSettings.bundleVersion = "1.0"; PlayerSettings.iOS.buildNumber = System.DateTime.Now.ToString("yyMMddHH");
         PlayerSettings.SetApplicationIdentifier(UnityEditor.Build.NamedBuildTarget.iOS, "com.qianfoshan.fogtemple");
         PlayerSettings.SetApplicationIdentifier(UnityEditor.Build.NamedBuildTarget.Standalone, "com.qianfoshan.fogtemple");
         PlayerSettings.iOS.targetDevice = iOSTargetDevice.iPadOnly; PlayerSettings.iOS.requiresFullScreen = true; PlayerSettings.iOS.hideHomeButton = true;
