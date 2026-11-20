@@ -32,6 +32,13 @@ jobs:
           find xcode \( -name "*.sh" -o -name "MapFileParser" -o -name "usymtool*" \) -exec chmod +x {} \; || true
           ls xcode | head
           xcodebuild -version
+          # Sideloading tools (AltServer, Sideloadly) turn the app name into an Apple "App ID" name, which must be ASCII.
+          # Keep the Info.plist name in English and give Chinese iPads the real name through InfoPlist.strings (added after the build).
+          PL=xcode/Info.plist
+          /usr/libexec/PlistBuddy -c "Set :CFBundleDisplayName QianFoShan" "$PL"
+          /usr/libexec/PlistBuddy -c "Delete :CFBundleLocalizations" "$PL" 2>/dev/null || true
+          /usr/libexec/PlistBuddy -c "Add :CFBundleLocalizations array" -c "Add :CFBundleLocalizations: string en" -c "Add :CFBundleLocalizations: string zh-Hant" -c "Add :CFBundleLocalizations: string zh-Hans" -c "Add :CFBundleLocalizations: string zh-HK" "$PL"
+          /usr/libexec/PlistBuddy -c "Print :CFBundleDisplayName" -c "Print :CFBundleLocalizations" "$PL"
 
       - name: Build unsigned app
         run: |
@@ -45,6 +52,14 @@ jobs:
           grep -q "BUILD SUCCEEDED" build.log
           APP=$(find dd/Build/Products -name "*.app" -maxdepth 3 | head -1)
           rm -rf Payload && mkdir -p Payload && cp -R "$APP" Payload/
+          APPDIR=$(find Payload -maxdepth 1 -name "*.app" | head -1)
+          for L in zh-Hant zh-Hans zh-HK; do
+            mkdir -p "$APPDIR/$L.lproj"
+            printf '"CFBundleDisplayName" = "霧鎖千佛山";\n"CFBundleName" = "霧鎖千佛山";\n' > "$APPDIR/$L.lproj/InfoPlist.strings"
+          done
+          mkdir -p "$APPDIR/en.lproj"
+          printf '"CFBundleDisplayName" = "QianFoShan";\n' > "$APPDIR/en.lproj/InfoPlist.strings"
+          plutil -lint "$APPDIR/zh-Hant.lproj/InfoPlist.strings"
           zip -qry QianFoShan-iPad.ipa Payload
           ls -la QianFoShan-iPad.ipa
 
