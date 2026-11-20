@@ -27,7 +27,7 @@ jobs:
       - name: Download Xcode project
         run: |
           gh release download "$TAG" -R "$GITHUB_REPOSITORY" -p "xcode-project.zip"
-          unzip -q xcode-project.zip -d xcode
+          mkdir -p xcode && ditto -x -k xcode-project.zip xcode
           # zips made on Windows lose the executable bit
           find xcode \( -name "*.sh" -o -name "MapFileParser" -o -name "usymtool*" \) -exec chmod +x {} \; || true
           ls xcode | head
