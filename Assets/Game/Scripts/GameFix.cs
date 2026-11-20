@@ -71,7 +71,7 @@ public static partial class G
         if (c.hall != null) return "殿裡的石僧在你背後。你轉身之前，祂已經走到了。";
         return "祂是從你沒看著的方向來的。走路時，記得回頭看。";
     }
-    public static void noteDeath(Chaser c) { deathWhy = deathReason(c); }
+    public static void noteDeath(Chaser c) { deathWhy = deathReason(c); QFLog.info("被抓（第 " + (player.deaths + 1) + " 次）：" + deathWhy + " · " + (player.inside != null ? player.inside.id : player.zone) + " (" + player.x.ToString("0") + "," + player.z.ToString("0") + ")"); }
     public static string deadSubText()
     {
         return deathWhy + "\n" + (player.deaths > 2 ? "祂們越來越熟悉你了。" : "") + "最後點亮的那盞燈籠還在燒；拿到的鑰匙都還在。";

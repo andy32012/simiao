@@ -9,7 +9,7 @@ using UnityEngine;
 public class AutoTest : MonoBehaviour
 {
     public static int seedOverride; public static bool active; static string outDir;
-    public static int errorCount; static string firstError;
+    public static int errorCount; static string firstError; public static float lastShotTime = -100;
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
     static void Init()
@@ -82,6 +82,8 @@ public class AutoTest : MonoBehaviour
         place(0, -315, 0); yield return wait(4.0f); check("gate opens with 3 keys", G.GATEOBJ.opening && G.GATEOBJ.open > 0.6f); yield return shot("16_gate_open");
         place(0, -326, 0); yield return wait(1.0f); yield return shot("17_win"); check("win", G.state == "won" && !Save.hasSave);
         log("fps~" + (1f / Mathf.Max(0.0001f, Time.smoothDeltaTime)).ToString("0") + " errors=" + errorCount + " fails=" + fails + (firstError != null ? " first: " + firstError : ""));
+        { var sp = QFShare.makeBundle("test"); check("share bundle written", sp != null && System.IO.File.Exists(sp) && new System.IO.FileInfo(sp).Length > 500); log("share file " + sp); }
+        log("qflog errors=" + QFLog.errors + " bugs=" + QFLog.bugs + " lastBug=" + QFLog.lastBug + " file=" + QFLog.filePath);
         Save.clear();
         quit(errorCount > 0 || fails > 0 ? 1 : 0);
     }
@@ -96,7 +98,7 @@ public class AutoTest : MonoBehaviour
         yield return new WaitForEndOfFrame();
         try
         {
-            var tex = ScreenCapture.CaptureScreenshotAsTexture(); File.WriteAllBytes(Path.Combine(outDir, name + ".png"), tex.EncodeToPNG()); Destroy(tex);
+            lastShotTime = Time.realtimeSinceStartup + 0.5f; var tex = ScreenCapture.CaptureScreenshotAsTexture(); File.WriteAllBytes(Path.Combine(outDir, name + ".png"), tex.EncodeToPNG()); Destroy(tex);
             log("shot " + name + " p=(" + G.player.x.ToString("0.0") + "," + G.player.z.ToString("0.0") + ") state=" + G.state + " dt=" + Time.deltaTime.ToString("0.000"));
         }
         catch (Exception e) { log("shot failed " + name + ": " + e.Message); }

@@ -43,16 +43,50 @@ public class Boot : MonoBehaviour
         }
         catch (Exception e) { err = e; }
         if (err != null) { fail("建立場景失敗", err); yield break; }
+        // shader warm-up: look at every kind of place once behind a black screen, so the first visit does not hitch
+        UI.setLoad(0.86f, "正在點燈……", false); UI.setFx("blackfx", 1f); G.state = "warmup";
+        yield return null;
+        float tw = Time.realtimeSinceStartup;
+        IEnumerator wu = warmup(); while (true) { bool more; try { more = wu.MoveNext(); } catch (Exception e) { Debug.LogException(e); break; } if (!more) break; yield return wu.Current; }
+        QFLog.info("著色器預熱完成，用時 " + (Time.realtimeSinceStartup - tw).ToString("0.0") + " 秒");
+        G.torch.intensity = 0; G.lampA.intensity = 0; G.lampB.intensity = 0;
+        G.resetGame(); G.state = "title"; UI.setFx("blackfx", 0f);
         UI.setLoad(1f, "準備好了。", true);
         ready = true;
         Debug.Log("[QF] boot ok, seed " + G.SEED + ", statues " + G.STATUES.Count + ", chasers " + G.CHASERS.Count + ", batches " + G.BATCHES.Count);
+    }
+
+    IEnumerator warmup()
+    {
+        var views = new System.Collections.Generic.List<Vector2>();
+        foreach (var t in G.TEMPLES)
+        {
+            var h = t.H; views.Add(new Vector2((h.minx + h.maxx) / 2, (h.minz + h.maxz) / 2));
+            var hh = h as Hall; if (hh != null) { var d = hh.W(0, hh.d / 2 + 8); views.Add(new Vector2(d[0], d[1])); }
+        }
+        if (G.m1 != null) { var c = G.m1.center(G.m1.entC, 1); views.Add(new Vector2(c[0], c[1])); }
+        if (G.m2 != null) { var c = G.m2.center(G.m2.entC, 1); views.Add(new Vector2(c[0], c[1])); }
+        views.Add(new Vector2(G.START.x, G.START.y - 30)); views.Add(new Vector2(0, 60)); views.Add(new Vector2(0, -200)); views.Add(new Vector2(0, -300));
+        if (G.NICHEPOS.HasValue) views.Add(new Vector2(G.NICHEPOS.Value.x + 16, G.NICHEPOS.Value.y));
+        foreach (var L in G.LANTERNS) { views.Add(new Vector2(L.x + 3, L.z)); break; }
+        G.torch.intensity = 2.6f;
+        foreach (var v in views)
+        {
+            float y = G.groundH(v.x, v.y) + G.EYE;
+            G.lampA.setPos(v.x + 2, y, v.y); G.lampA.intensity = 1.2f; G.lampB.setPos(v.x - 2, y, v.y + 2); G.lampB.intensity = 1.2f;
+            for (int k = 0; k < 4; k++)
+            {
+                G.camera.setPos(v.x, y, v.y); G.camera.setRot(-0.05f, k * Mathf.PI / 2, 0); G.cullPass();
+                yield return null;
+            }
+        }
     }
 
     void fail(string what, Exception e) { bootError = what + "：" + e.Message; Debug.LogException(e); UI.setLoad(0f, bootError, false); }
 
     void Update()
     {
-        if (!ready) { if (G.camera.cam != null) G.renderApply(); return; }
+        if (!ready) { try { UI.update(Time.unscaledDeltaTime); } catch (Exception e) { Debug.LogException(e); } if (G.camera.cam != null) G.renderApply(); return; }
         float dt = Time.unscaledDeltaTime;
         try { G.frame(dt); } catch (Exception e) { Debug.LogException(e); }
         try { UI.update(dt); } catch (Exception e) { Debug.LogException(e); }

@@ -80,7 +80,7 @@ public static class QFSetup
         PlayerSettings.iOS.targetOSVersionString = "15.0";
         PlayerSettings.SetScriptingBackend(UnityEditor.Build.NamedBuildTarget.iOS, ScriptingImplementation.IL2CPP);
         PlayerSettings.SetArchitecture(UnityEditor.Build.NamedBuildTarget.iOS, 1);   // ARM64
-        PlayerSettings.iOS.appleEnableAutomaticSigning = false;
+        PlayerSettings.iOS.appleEnableAutomaticSigning = false; PlayerSettings.enableFrameTimingStats = true;
         PlayerSettings.bundleVersion = "1.0"; PlayerSettings.iOS.buildNumber = System.DateTime.Now.ToString("yyMMddHH");
         PlayerSettings.SetApplicationIdentifier(UnityEditor.Build.NamedBuildTarget.iOS, "com.qianfoshan.fogtemple");
         PlayerSettings.SetApplicationIdentifier(UnityEditor.Build.NamedBuildTarget.Standalone, "com.qianfoshan.fogtemple");

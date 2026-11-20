@@ -6,7 +6,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-public static class UI
+public static partial class UI
 {
     // ================= palette (sRGB UI colours) =================
     static Color H(int hex, float a = 1f) { return new Color(((hex >> 16) & 255) / 255f, ((hex >> 8) & 255) / 255f, (hex & 255) / 255f, a); }
@@ -171,7 +171,7 @@ public static class UI
 
         buildHud(); buildMsg(); buildTouch();
         blackImg = addFx("blackfx", Texture2D.whiteTexture, 0f, Color.black); fx.Remove("blackfx");
-        buildTitle(); buildPause(); buildMap(); buildCred(); buildDead(); buildWin();
+        buildTitle(); buildPause(); buildMap(); buildCred(); buildDead(); buildWin(); buildDebug();
 
         show("hud", false); show("title", true);
         if (Input.touchSupported && !Input.mousePresent) usingTouch = true;
@@ -542,6 +542,7 @@ public static class UI
         if (blackCur != blackTarget) { blackCur = Mathf.MoveTowards(blackCur, blackTarget, dt / 0.9f); applyFx(blackImg, blackCur); }
         // grain jitter (~9 steps / s)
         grainT -= dt; if (grainT <= 0 && grainImg.enabled) { grainT = 0.11f; var r = grainImg.uvRect; r.x = UnityEngine.Random.value; r.y = UnityEngine.Random.value; grainImg.uvRect = r; }
+        debugUpdate(dt);
     }
 
     static void relayout()
