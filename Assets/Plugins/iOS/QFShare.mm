@@ -12,7 +12,7 @@ extern "C" void QFShareFile(const char* path, const char* subject)
         UIViewController* root = UnityGetGLViewController();
         if (root == nil) return;
         UIActivityViewController* vc = [[UIActivityViewController alloc] initWithActivityItems:@[url] applicationActivities:nil];
-        if (subject != NULL) { @try { [vc setValue:[NSString stringWithUTF8String:subject] forKey:@"subject"]; } @catch (NSException* e) {} }
+        (void)subject;   // no KVC "subject": Unity builds with Objective-C exceptions disabled
         // iPad: the share sheet is a popover and needs an anchor, otherwise it crashes
         UIPopoverPresentationController* pop = vc.popoverPresentationController;
         if (pop != nil)
