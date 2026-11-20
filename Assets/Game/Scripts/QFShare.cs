@@ -56,7 +56,7 @@ public static class QFShare
 #if UNITY_IOS && !UNITY_EDITOR
         try { QFShareFile(path, "霧鎖千佛山 記錄"); return "已開啟分享"; } catch (Exception e) { Debug.LogWarning("share sheet failed: " + e.Message); return "失敗"; }
 #elif UNITY_STANDALONE_WIN || UNITY_EDITOR_WIN
-        try { System.Diagnostics.Process.Start("explorer.exe", "/select,\"" + path.Replace('/', '\') + "\""); return "已開啟資料夾"; }
+        try { System.Diagnostics.Process.Start("explorer.exe", "/select,\"" + path.Replace('/', Path.DirectorySeparatorChar) + "\""); return "已開啟資料夾"; }
         catch (Exception) { GUIUtility.systemCopyBuffer = path; return "路徑已複製"; }
 #else
         GUIUtility.systemCopyBuffer = path; return "路徑已複製";
